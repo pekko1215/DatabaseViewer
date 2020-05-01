@@ -27,6 +27,11 @@ cli.command('run <uri>', `定義書の対象となるデータベースを、URI
         `  ${cli.name} run sqlite://dbtest.db\n` +
         `  ${cli.name} run postgres://user:pass@example.com:5432/dbname`)
 
+cli.command('export <type>', '定義書データを標準出力にエクスポートします')
+    .action(async (type) => {
+        // 未実装
+    })
+
 cli.help()
 
 cli.parse();
