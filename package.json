@@ -1,7 +1,7 @@
 {
   "name": "database_viewer",
   "version": "1.0.0",
-  "description": "",
+  "description": "データベース仕様書をWebベースで出力、編集できます。",
   "main": "app.js",
   "dependencies": {
     "cac": "^6.5.8",
@@ -20,14 +20,19 @@
     "vinyl-source-stream": "^2.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "app.js"
   },
   "bin": {
     "dbview": "app.js"
   },
   "private": true,
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com:pekko1215/DatabaseViewer.git"
+  },
+  "author": "pekko1215",
+  "license": "MIT",
   "preferGlobal": true
 }
