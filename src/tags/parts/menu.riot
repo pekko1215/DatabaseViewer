@@ -1,0 +1,106 @@
+<app-menu>
+    <div class="sidebar-header">
+        <h3>DBViewer</h3>
+    </div>
+    <ul class="list-unstyled components">
+        <p>
+            <span class="db-name">{state.DBData.name}</span>
+            <span class="physics-name">{state.DBData.physicsName}</span>
+        </p>
+        <li each={(table,idx) in state.DBData.tables}>
+            <a href="#menuGroup{idx}" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                {table.name}
+                <span class="physics-name">{table.physicsName}</span>
+            </a>
+            <ul id="menuGroup{idx}" class="collapse list-unstyled" each={column in table.columns}>
+                <li>
+                    <a href="{'#'+column.name+'_'+idx}">{column.name}</a>
+                    <span class="physics-name">{column.physicsName}</span>
+                </li>
+            </ul>
+
+        </li>
+    </ul>
+    <script>
+        export default {
+            state: {
+                components: {},
+                DBData: {
+                    tables: []
+                },
+            },
+            async onBeforeMount() {},
+            async onMounted(prop) {
+                $('app-menu').mCustomScrollbar({
+                    theme: 'minimal'
+                });
+                $('app-menu').toggleClass('active');
+                $('app-contents').toggleClass('active');
+                this.state.DBData = prop.DBData;
+                this.update();
+            }
+        }
+    </script>
+    <style scoped>
+         :host {
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 999;
+            background: #7386D5;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        
+         :host.active {
+            margin-left: -250px;
+        }
+        
+         :host .sidebar-header {
+            padding: 20px;
+            background: #6d7fcc;
+        }
+        
+         :host ul.components {
+            padding: 20px 0;
+            border-bottom: 1px solid #47748b;
+        }
+        
+         :host ul p {
+            color: #fff;
+            padding: 10px;
+        }
+        
+         :host ul li a {
+            padding: 10px;
+            font-size: 1.1em;
+            display: block;
+        }
+        
+         :host ul li a:hover {
+            color: #7386D5;
+            background: #fff;
+        }
+        
+         :host ul li.active>a,
+        a[aria-expanded="true"] {
+            color: #fff;
+            background: #6d7fcc;
+        }
+        
+        .physics-name {
+            font-size: 0.2rem;
+            position: absolute;
+            right: 45px;
+            bottom: 2px;
+            color: lightgray;
+        }
+        
+        .list-unstyled .collapse>*,
+        .list-unstyled.components>* {
+            position: relative;
+        }
+    </style>
+</app-menu>

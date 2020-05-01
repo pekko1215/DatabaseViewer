@@ -1,0 +1,30 @@
+<app>
+    <app-header DBData={props.DBData}></app-header>
+    <app-menu DBData={props.DBData}></app-menu>
+    <app-contents DBData={props.DBData}></app-contents>
+    <script>
+        import Header from './parts/header.riot';
+        import Menu from './parts/menu.riot';
+        import Contents from './parts/contents.riot';
+
+        console.log({
+            Header,
+            Menu,
+            Contents
+        })
+
+        export default {
+            components: {
+                'app-menu': Header,
+                'app-menu': Menu,
+                'app-contents': Contents
+            },
+        }
+    </script>
+    <style scoped>
+         :host {
+            display: flex;
+            width: 100%;
+        }
+    </style>
+</app>

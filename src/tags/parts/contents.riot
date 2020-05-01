@@ -1,0 +1,202 @@
+<app-contents>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button type="button" onclick={onToggleMenu} id="sidebarCollapse" class="btn btn-info">
+                <i class="fas fa-align-left"></i>
+                <span>Toggle Sidebar</span>
+            </button>
+        </div>
+    </nav>
+    <div if={state.DBData}>
+        <div class="container-fluid bg-light" each={(table,idx) in state.DBData.tables}>
+            <article style="max-width: 1300px;">
+                <div class="input-group table-name">
+                    <h2 style="margin-right:4px;" contenteditable={table.nameEditing ? "plaintext-only" : '' }>
+                        {table.name}</h2>
+                    <button style={!table.nameEditing ? '' : 'display:none;' } onclick={editTableNameEvent({table})} class="btn btn-outline-secondary" type="button"><i class="fas fa-edit"></i></button>
+                    <button style={table.nameEditing ? '' : 'display:none;' } onclick={table.acceptNameEdit} class="btn btn-success" type="button"><i class="fas fa-check"></i></button>
+                    <button style={table.nameEditing ? '' : 'display:none;' } onclick={table.cancelNameEdit} class="btn btn-danger" type="button"><i class="fas fa-times"></i></button>
+                </div>
+                <p class="table-name">{table.physicsName}</p>
+                <table class="table table-hover">
+                    <thead class="thead-lignt">
+                        <tr>
+                            <th>No</th>
+                            <th>論理名</th>
+                            <th>カラム名</th>
+                            <th>データ型</th>
+                            <th>Not Null</th>
+                            <th>PK</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template each={column in table.columns}>
+                            <tr id="{column.name}_{idx}">
+                                <td rowspan="2">{column.opts.cid}</td>
+                                <td>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" value="{column.name}" placeholder="{column.physicsName}" disabled={!column.nameEditing}>
+                                        <div class="input-group-append">
+                                            <button style={!column.nameEditing ? '' : 'display:none;' } onclick={editNameEvent({table,column})} class="btn btn-outline-secondary" type="button"><i class="fas fa-edit"></i></button>
+                                            <button style={column.nameEditing ? '' : 'display:none;' } onclick={column.acceptNameEdit} class="btn btn-success" type="button"><i class="fas fa-check"></i></button>
+                                            <button style={column.nameEditing ? '' : 'display:none;' } onclick={column.cancelNameEdit} class="btn btn-danger" type="button"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{column.physicsName}</td>
+                                <td>{column.type}</td>
+                                <td>{!!column.opts.notnull}</td>
+                                <td>{!!column.opts.pk}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div class="input-group mb-3">
+                                        <textarea class="form-control" rows="3" disabled={!column.commentEditing}>{column.comment}</textarea>
+                                        <div class="input-group-append textarea-group">
+                                            <button style={!column.commentEditing ? '' : 'display:none;' } onclick={editCommentEvent({table,column})} class="btn btn-outline-secondary" type="button"><i class="fas fa-edit"></i></button>
+                                            <button style={column.commentEditing ? '' : 'display:none;' } onclick={column.acceptCommentEdit} class="btn btn-success" type="button"><i class="fas fa-check"></i></button>
+                                            <button style={column.commentEditing ? '' : 'display:none;' } onclick={column.cancelCommentEdit} class="btn btn-danger" type="button"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <div class="card" style="width: 100%;">
+                    <div class="card-body">
+                        <h5 class="card-title">SQL</h5>
+                        <p class="card-text">
+                            <pre><code>{table.sql}</code></pre>
+                        </p>
+                    </div>
+                </div>
+                <hr>
+            </article>
+            <br>
+            <br>
+        </div>
+    </div>
+
+    <script>
+        export default {
+            async onMounted(prop) {
+                this.state.DBData = prop.DBData;
+                this.update();
+            },
+            components: {},
+            onToggleMenu() {
+                $('app-menu').toggleClass('active');
+                $('app-contents').toggleClass('active');
+            },
+            fetchUpdate(table, column, obj) {
+                if (column) {
+                    column = '/' + column
+                } else {
+                    column = '';
+                }
+                return fetch(`/api/db/${table}${column}`, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(obj)
+                })
+            },
+            editTableNameEvent({ table }) {
+                return e => {
+                    table.nameEditing = true;
+                    table.acceptNameEdit = e => {
+                        let v = $(e.target).parents('div.input-group').find('h2').text();
+                        this.fetchUpdate(table.physicsName, null, {
+                            name: v
+                        })
+                        table.cancelNameEdit();
+                    }
+                    table.cancelNameEdit = e => {
+                        table.nameEditing = false;
+                        this.update();
+                    }
+                    this.update();
+                    $(e.target).parents('div.input-group').find('h2').focus();
+                }
+            },
+            editNameEvent({ table, column }) {
+                return e => {
+                    column.nameEditing = true;
+                    column.acceptNameEdit = (e) => {
+                        let v = $(e.target).parents('div.input-group').find('input').val();
+                        column.name = v;
+                        this.fetchUpdate(table.physicsName, column.physicsName, {
+                            name: v
+                        });
+                        column.cancelNameEdit();
+                    }
+                    column.cancelNameEdit = () => {
+                        column.nameEditing = false;
+                        this.update();
+                    }
+                    this.update();
+                }
+            },
+            editCommentEvent(data) {
+                const {
+                    table,
+                    column
+                } = data;
+                return e => {
+                    column.commentEditing = true;
+                    column.acceptCommentEdit = (e) => {
+                        let v = $(e.target).parents('td').find('textarea').val();
+                        column.comment = v;
+                        this.fetchUpdate(table.physicsName, column.physicsName, {
+                            comment: v
+                        });
+                        column.cancelCommentEdit();
+                    }
+                    column.cancelCommentEdit = () => {
+                        column.commentEditing = false;
+                        this.update();
+                    }
+                    this.update();
+                }
+            }
+        }
+    </script>
+    <style scoped>
+        :host {
+            width: calc(100% - 250px);
+            padding: 40px;
+            min-height: 100vh;
+            transition: all 0.3s;
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 9pt;
+        }
+
+        :host.active {
+            width: 100%;
+        }
+
+        .textarea-group {
+            flex-direction: column;
+        }
+
+        .textarea-group button {
+            height: 50%;
+        }
+
+        i.fas {
+            pointer-events: none;
+        }
+
+        .form-control {
+            /* font-size: 12pt; */
+        }
+
+        h2[contenteditable="plaintext-only"] {
+            background: lightgray;
+        }
+    </style>
+</app-contents>

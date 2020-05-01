@@ -1,0 +1,33 @@
+{
+  "name": "database_viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "cac": "^6.5.8",
+    "express": "^4.17.1",
+    "sequelize": "^5.21.6",
+    "sqlite3": "^4.1.1"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.9.5",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.1",
+    "gulp": "^4.0.2",
+    "gulp-riot": "^1.1.5",
+    "riot": "^4.12.0",
+    "riotify": "^4.0.0",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "dbview": "app.js"
+  },
+  "private": true,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "preferGlobal": true
+}
